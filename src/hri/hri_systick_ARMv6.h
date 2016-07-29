@@ -1,7 +1,7 @@
 /**
  * \file
  *
- * \brief USART related functionality declaration.
+ * \brief SAM0+ SysTick
  *
  * Copyright (C) 2014 Atmel Corporation. All rights reserved.
  *
@@ -17,7 +17,7 @@
  *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ *    and/or other materials provided with the distributionn.
  *
  * 3. The name of Atmel may not be used to endorse or promote products derived
  *    from this software without specific prior written permission.
@@ -38,100 +38,72 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * \asf_license_stop
- *
  */
 
-#ifndef _HPL_USART_H_INCLUDED
-#define _HPL_USART_H_INCLUDED
-
-/**
- * \addtogroup HPL USART SYNC
- *
- * \section hpl_usart_sync_rev Revision History
- * - v1.0.0 Initial Release
- *
- *@{
- */
-
-#include <compiler.h>
+#ifndef _HRI_SYSTICK_ARMV6_H_INCLUDED
+#define _HRI_SYSTICK_ARMV6_H_INCLUDED
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * \brief USART flow control state
- */
-union usart_flow_control_state {
-	struct {
-		uint8_t cts         : 1;
-		uint8_t rts         : 1;
-		uint8_t unavailable : 1;
-		uint8_t reserved    : 5;
-	} bit;
-	uint8_t value;
-};
+#include <compiler.h>
 
 /**
- * \brief USART baud rate mode
+ * \addtogroup hri_systick_group SysTick Low Level Driver
+ *
+ * \section hri_systick_rev Revision History
+ * - v0.0.0.1 Initial Commit
+ *
+ *@{
  */
-enum usart_baud_rate_mode {
-	USART_BAUDRATE_ASYNCH_ARITHMETIC,
-	USART_BAUDRATE_ASYNCH_FRACTIONAL,
-	USART_BAUDRATE_SYNCH
-};
+
+typedef uint32_t hri_systick_csr_reg_t;
+typedef uint32_t hri_systick_rvr_reg_t;
+typedef uint32_t hri_systick_crv_reg_t;
+typedef uint32_t hri_systick_csr_calib_t;
 
 /**
- * \brief USART data order
+ * \name Access functions
  */
-enum usart_data_order {
-	USART_DATA_ORDER_MSB = 0,
-	USART_DATA_ORDER_LSB = 1
-};
+//@{
+static inline void hri_systick_write_SYSTRVR_reg(void *const hw,
+		const hri_systick_rvr_reg_t value)
+{
+	((SysTick_Type *)hw)->LOAD = value;
+}
 
-/**
- * \brief USART mode
- */
-enum usart_mode {
-	USART_MODE_ASYNCHRONOUS = 0,
-	USART_MODE_SYNCHRONOUS = 1
-};
+static inline void hri_systick_write_SYSTCSR_reg(void *const hw,
+		const hri_systick_csr_reg_t value)
+{
+	((SysTick_Type *)hw)->CTRL = value;
+}
 
-/**
- * \brief USART parity
- */
-enum usart_parity {
-	USART_PARITY_EVEN = 0,
-	USART_PARITY_ODD = 1,
-	USART_PARITY_NONE = 2,
-	USART_PARITY_SPACE = 3,
-	USART_PARITY_MARK = 4
-};
+static inline void hri_systick_clear_SYSTCSR_ENABLE_bit(void *const hw)
+{
+	((SysTick_Type *)hw)->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
+}
 
-/**
- * \brief USART stop bits mode
- */
-enum usart_stop_bits {
-	USART_STOP_BITS_ONE = 0,
-	USART_STOP_BITS_TWO = 1,
-	USART_STOP_BITS_ONE_P_FIVE = 2
-};
+static inline bool hri_systick_get_SYSTCSR_COUNTFLAG_bit(const void *const hw)
+{
+	return (bool)(((const SysTick_Type *)hw)->CTRL & SysTick_CTRL_COUNTFLAG_Msk);
+}
 
-/**
- * \brief USART character size
- */
-enum usart_character_size {
-	USART_CHARACTER_SIZE_8BITS = 0,
-	USART_CHARACTER_SIZE_9BITS = 1,
-	USART_CHARACTER_SIZE_5BITS = 5,
-	USART_CHARACTER_SIZE_6BITS = 6,
-	USART_CHARACTER_SIZE_7BITS = 7
-};
+static inline hri_systick_crv_reg_t hri_systick_read_SYSTCVR_reg(
+		const void *const hw)
+{
+	return ((SysTick_Type *)hw)->VAL;
+}
 
-//@}
+static inline void hri_systick_write_SYSTCVR_reg( const void *const hw,
+		const hri_systick_crv_reg_t value)
+{
+	((SysTick_Type *)hw)->VAL = value;
+}
+
+/**@}*/
 
 #ifdef __cplusplus
 }
 #endif
-/**@}*/
-#endif /* _HPL_USART_H_INCLUDED */
+#endif /* _HRI_SYSTICK_ARMV6_H_INCLUDED */

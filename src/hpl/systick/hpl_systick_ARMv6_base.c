@@ -1,7 +1,7 @@
 /**
  * \file
  *
- * \brief Ringbuffer functionality implementation.
+ * \brief SysTick related functionality implementation.
  *
  * Copyright (C) 2014 Atmel Corporation. All rights reserved.
  *
@@ -40,90 +40,77 @@
  * \asf_license_stop
  *
  */
-#include "utils_ringbuffer.h"
+
+#include <hpl_time_measure.h>
+#include "hpl_systick_ARMv6_config.h"
+#ifndef _UNIT_TEST_
+#    include <hri_systick_ARMv6.h>
+#else
+#    include <hri_systick_ARMv6_mock.h>
+#endif
 
 /**
- * \brief Ringbuffer init
+ * \brief Initialize system time module
  */
-int32_t ringbuffer_init(struct ringbuffer *rb, void *buf, uint32_t size)
+void _system_time_init(void *const hw)
 {
-	ASSERT(rb && buf && size);
+	hri_systick_write_SYSTRVR_reg(hw,
+			0xFFFFFF << SysTick_LOAD_RELOAD_Pos);
+	hri_systick_write_SYSTCSR_reg(hw,
+			( 1 << SysTick_CTRL_ENABLE_Pos ) |
+			( CONF_SYSTICK_TICKINT << SysTick_CTRL_TICKINT_Pos ) |
+			( 1 << SysTick_CTRL_CLKSOURCE_Pos ));
+}
+/**
+ * \brief Initialize delay functionality
+ */
+void _delay_init(void *const hw)
+{
+	_system_time_init(hw);
+}
 
-	/*
-	 * buf size must be aligned to power of 2
-	 */
-	if ((size & (size - 1)) != 0) {
-		return ERR_INVALID_ARG;
+/**
+ * \brief De-initialize system time module
+ */
+void _system_time_deinit(void *const hw)
+{
+	hri_systick_clear_SYSTCSR_ENABLE_bit(hw);
+}
+
+/**
+ * \brief Get system time
+ */
+system_time_t _system_time_get(const void *const hw)
+{
+	return (system_time_t)hri_systick_read_SYSTCVR_reg(hw);
+}
+
+/**
+ * \brief Get maximum possible system time
+ */
+system_time_t _system_time_get_max_time_value(const void *const hw)
+{
+	(void)hw;
+	return 0xFFFFFF;
+}
+/**
+ * \brief Delay loop to delay n number of cycles
+ */
+void _delay_cycles(void *const hw, uint32_t cycles)
+{
+	uint8_t n = cycles >> 24;
+	uint32_t buf = cycles;
+
+	while (n--) {
+		hri_systick_write_SYSTRVR_reg(hw, 0xFFFFFF);
+		hri_systick_write_SYSTCVR_reg(hw, 0xFFFFFF);
+		while (!hri_systick_get_SYSTCSR_COUNTFLAG_bit(hw)) {;
+		}
+		buf -= 0xFFFFFF;
 	}
 
-	/* size - 1 is faster in calculation */
-	rb->size = size - 1;
-	rb->read_index = 0;
-	rb->write_index = rb->read_index;
-	rb->buf = (uint8_t *)buf;
-
-	return ERR_NONE;
-}
-
-/**
- * \brief Get one byte from ringbuffer
- *
- */
-int32_t ringbuffer_get(struct ringbuffer *rb, uint8_t *data)
-{
-	ASSERT(rb && data);
-
-	if (rb->write_index != rb->read_index) {
-		*data = rb->buf[rb->read_index & rb->size];
-		rb->read_index++;
-		return ERR_NONE;
+	hri_systick_write_SYSTRVR_reg(hw, buf);
+	hri_systick_write_SYSTCVR_reg(hw, buf);
+	while (!hri_systick_get_SYSTCSR_COUNTFLAG_bit(hw)) {;
 	}
-
-	return ERR_NOT_FOUND;
 }
-
-/**
- * \brief Put one byte to ringbuffer
- *
- */
-int32_t ringbuffer_put(struct ringbuffer *rb, uint8_t data)
-{
-	ASSERT(rb);
-
-	rb->buf[rb->write_index & rb->size] = data;
-
-	/*
-	 * buffer full strategy: new data will overwrite the oldest data in
-	 * the buffer
-	 */
-	if ((rb->write_index - rb->read_index) > rb->size) {
-		rb->read_index = rb->write_index - rb->size;
-	}
-
-	rb->write_index++;
-
-	return ERR_NONE;
-}
-
-/**
- * \brief Return the element number of ringbuffer
- */
-uint32_t ringbuffer_num(struct ringbuffer *rb)
-{
-	ASSERT(rb);
-
-	return rb->write_index - rb->read_index;
-}
-
-/**
- * \brief Flush ringbuffer
- */
-uint32_t ringbuffer_flush(struct ringbuffer *rb)
-{
-	ASSERT(rb);
-
-	rb->read_index = rb->write_index;
-
-	return ERR_NONE;
-}
-

@@ -1,9 +1,9 @@
 /**
  * \file
  *
- * \brief Common SPI related functionality declaration.
+ * \brief Time measure related functionality declaration.
  *
- * Copyright (C) 2015 Atmel Corporation. All rights reserved.
+ * Copyright (C) 2014 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -41,41 +41,64 @@
  *
  */
 
-#ifndef _HPL_SPI_SYNC_H_INCLUDED
-#define _HPL_SPI_SYNC_H_INCLUDED
-
-#include <compiler.h>
-#include <utils.h>
-
-#include <hpl_spi.h>
+#ifndef _HPL_TIME_MEASURE_H_INCLUDED
+#define _HPL_TIME_MEASURE_H_INCLUDED
 
 /**
- * \addtogroup hpl_spi HPL SPI
+ * \addtogroup HPL Time measure
  *
- * \section hpl_spi_rev Revision History
+ * \section hpl_time_measure_rev Revision History
  * - v1.0.0 Initial Release
  *
  *@{
  */
 
+#include <compiler.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** SPI driver to support sync HAL */
-struct _spi_sync_dev {
-	/** Pointer to the hardware base or private data for special device. */
-	void *prvt;
-	/** Data size, number of bytes for each character */
-	uint8_t char_size;
-	/** Dummy byte used in master mode when reading the slave */
-	uint16_t dummy_byte;
-};
+/**
+ * \brief System time type
+ */
+typedef uint32_t system_time_t;
+
+/**
+ * \name HPL functions
+ */
+//@{
+/**
+ * \brief Initialize system time module
+ *
+ * \param[in] hw The pointer to hardware instance to initialize
+ */
+void _system_time_init(void *const hw);
+
+/**
+ * \brief De-initialize system time module
+ *
+ * \param[in] hw The pointer to hardware instance to initialize
+ */
+void _system_time_deinit(void *const hw);
+
+/**
+ * \brief Get system time
+ *
+ * \param[in] hw The pointer to hardware instance to initialize
+ */
+system_time_t _system_time_get(const void *const hw);
+
+/**
+ * \brief Get maximum possible system time
+ *
+ * \param[in] hw The pointer to hardware instance to initialize
+ */
+system_time_t _system_time_get_max_time_value(const void *const hw);
+//@}
 
 #ifdef __cplusplus
 }
 #endif
-
 /**@}*/
-#endif /* ifndef _HPL_SPI_SYNC_H_INCLUDED */
-
+#endif /* _HPL_TIME_MEASURE_H_INCLUDED */

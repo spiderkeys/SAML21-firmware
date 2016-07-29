@@ -158,12 +158,12 @@ static inline uint32_t _get_cycles_for_us_internal(const uint16_t us,
 		const uint32_t freq, const uint8_t power)
 {
 	switch (power) {
-	case 8: return (us * (freq / 100000) + 29) / 30;
-	case 7: return (us * (freq / 10000) + 299) / 300;
-	case 6: return (us * (freq / 1000) + 2999) / 3000;
-	case 5: return (us * (freq / 100) + 29999) / 30000;
-	case 4: return (us * (freq / 10) + 299999) / 300000;
-	default: return (us * freq + 2999999) / 3000000;
+	case 8: return (us * (freq / 100000) - 1) / 10 + 1;
+	case 7: return (us * (freq / 10000) - 1) / 100 + 1;
+	case 6: return (us * (freq / 1000) - 1) / 1000 + 1;
+	case 5: return (us * (freq / 100) - 1) / 10000 + 1;
+	case 4: return (us * (freq / 10) - 1) / 100000 + 1;
+	default: return (us * freq - 1) / 1000000 + 1;
 	}
 }
 
@@ -182,12 +182,12 @@ static inline uint32_t _get_cycles_for_ms_internal(const uint16_t ms,
 		const uint32_t freq, const uint8_t power)
 {
 	switch (power) {
-	case 8: return (ms * (freq / 100000) + 2) / 3 * 100;
-	case 7: return (ms * (freq / 10000) + 2) / 3 * 10;
-	case 6: return (ms * (freq / 1000) + 2) / 3;
-	case 5: return (ms * (freq / 100) + 29) / 30;
-	case 4: return (ms * (freq / 10) + 299) / 300;
-	default: return (ms * (freq / 1) + 2999) / 3000;
+	case 8: return (ms * (freq / 100000)) * 100;
+	case 7: return (ms * (freq / 10000)) * 10;
+	case 6: return (ms * (freq / 1000));
+	case 5: return (ms * (freq / 100) - 1) / 10 + 1;
+	case 4: return (ms * (freq / 10) - 1) / 100 + 1;
+	default: return (ms * freq - 1) / 1000 + 1;
 	}
 }
 
@@ -197,42 +197,4 @@ static inline uint32_t _get_cycles_for_ms_internal(const uint16_t ms,
 uint32_t _get_cycles_for_ms(const uint16_t ms)
 {
 	return _get_cycles_for_ms_internal(ms, CONF_CPU_FREQUENCY, CPU_FREQ_POWER);
-}
-/**
- * \brief Initialize delay functionality
- */
-void _delay_init(void *const hw)
-{
-	(void)hw;
-}
-/**
- * \brief Delay loop to delay n number of cycles
- */
-void _delay_cycles(void *const hw, uint32_t cycles)
-{
-#ifndef _UNIT_TEST_
-	(void)hw;
-	(void)cycles;
-#if defined __GNUC__
-	__asm (
-		".syntax unified\n" \
-		"__delay:\n" \
-		"subs r1, r1, #1\n" \
-		"bhi __delay\n" \
-		".syntax divided"
-	);
-#elif defined __CC_ARM
-	__asm (
-		"__delay:\n" \
-		"subs cycles, cycles, #1\n" \
-		"bhi __delay\n"
-	);
-#elif defined __ICCARM__
-	__asm (
-		"__delay:\n" \
-		"subs r1, r1, #1\n" \
-		"bhi __delay\n"
-	);
-#endif
-#endif
 }

@@ -10,8 +10,6 @@
 
 #include <hal_gpio.h>
 
-#define EDBG_COM_TX  GPIO(GPIO_PORTA, 22)
-#define EDBG_COM_RX  GPIO(GPIO_PORTA, 23)
-#define IO1_LIGHTSENSOR  GPIO(GPIO_PORTB, 5)
+#define LED0  GPIO(GPIO_PORTB, 10)
 
 #endif // ATMEL_START_PINS_H_INCLUDED

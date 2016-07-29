@@ -26,7 +26,7 @@ PROJECT_NAME="saml21"
 PROJECT_TYPE=executable
 
 # PROJECT_MAIN - filename within your source directory that contains main()
-PROJECT_MAIN=main.cpp
+PROJECT_MAIN=main.c
 
 # TARGET - the name you want your target to have (bin/release/[whatgoeshere])
 TARGET=saml21
@@ -38,7 +38,6 @@ LDINCLUDES=-I"src/" \
 			-I"src/config" \
 			-I"src/hal/include" \
 			-I"src/hal/utils/include" \
-			-I"src/hpl/adc" \
 			-I"src/hpl/core" \
 			-I"src/hpl/dmac" \
 			-I"src/hpl/gclk" \
@@ -47,8 +46,7 @@ LDINCLUDES=-I"src/" \
 			-I"src/hpl/oscctrl" \
 			-I"src/hpl/pm" \
 			-I"src/hpl/port" \
-			-I"src/hpl/sercom" \
-			-I"src/hpl/tc" \
+			-I"src/hpl/systick" \
 			-I"src/hri" \
 			-I"src/CMSIS/Include" \
 			-I"src/saml21b/include"	
@@ -129,7 +127,7 @@ endif
 
 # --- FILENAME LISTS: (and other internal variables)
 DIR_GUARD=@mkdir -p $(@D)
-OBJECT_MAIN=$(OBJECT_DIR)/$(CFG)/$(SOURCE_DIR)/$(patsubst %.cpp,%.o,$(PROJECT_MAIN))
+OBJECT_MAIN=$(OBJECT_DIR)/$(CFG)/$(SOURCE_DIR)/$(patsubst %.c,%.o,$(PROJECT_MAIN))
 
 # Find all C and C++ source files
 SOURCES=$(shell find $(SOURCE_DIR) -type f -name "*.c*")
