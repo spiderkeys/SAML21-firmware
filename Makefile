@@ -93,7 +93,7 @@ CXX=arm-none-eabi-g++
 
 # --- C++ compiler flags. We'll add on to these later based on build target.
 CXFLAGS=-x c -mthumb -ffunction-sections -mlong-calls -Wall -std=gnu99 -D__SAML21J18B__ -mcpu=cortex-m0plus
-CXXFLAGS=-x c -mthumb -ffunction-sections -mlong-calls -Wall -std=c++11 -D__SAML21J18B__ -mcpu=cortex-m0plus
+CXXFLAGS=-x c++ -mthumb -ffunction-sections -mlong-calls -Wall -std=c++11 -D__SAML21J18B__ -mcpu=cortex-m0plus
 
 # --------------------------------------------------------------------------------------------------
 
