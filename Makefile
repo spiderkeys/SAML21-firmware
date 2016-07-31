@@ -31,14 +31,13 @@ PROJECT_MAIN=main.c
 # TARGET - the name you want your target to have (bin/release/[whatgoeshere])
 TARGET=saml21
 
-# --- LIBRARY CONFIGURATION
-
 # LDINCLUDES - Include paths for libraries, i.e. '-I/usr/local/include'
 LDINCLUDES=-I"src/" \
 			-I"src/config" \
 			-I"src/hal/include" \
 			-I"src/hal/utils/include" \
 			-I"src/hpl/core" \
+			-I"src/hpl/adc" \
 			-I"src/hpl/dmac" \
 			-I"src/hpl/gclk" \
 			-I"src/hpl/mclk" \
@@ -46,10 +45,14 @@ LDINCLUDES=-I"src/" \
 			-I"src/hpl/oscctrl" \
 			-I"src/hpl/pm" \
 			-I"src/hpl/port" \
+			-I"src/hpl/sercom" \
 			-I"src/hpl/systick" \
+			-I"src/hpl/tc" \
 			-I"src/hri" \
 			-I"src/CMSIS/Include" \
-			-I"src/saml21b/include"	
+			-I"src/saml21b/include"	\
+			-I"src/adp" \
+			-I"src/sleep_manager"
 
 # LDLIBPATHS - Lib paths for libraries, i.e. '-L/usr/local/lib'
 LDLIBPATHS=-L"../saml21b/gcc/gcc"
@@ -62,7 +65,7 @@ LDFLAGS=$(LDLIBPATHS) \
 			--specs=nano.specs \
 			-Wl,--gc-sections \
 			-mcpu=cortex-m0plus \
-			-T"src/saml21b/gcc/gcc/saml21j18b_flash.ld"
+			-T"linker_scripts/saml21j18b_flash.ld"
 
 # LDLIBS - Which libs to link to, i.e. '-lm' or 'somelib.a'
 #
