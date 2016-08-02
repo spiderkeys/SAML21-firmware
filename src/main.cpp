@@ -4,6 +4,8 @@ extern "C"
 	#include "atmel_start.h"
 }
 
+#include "drivers/CRTC.h"
+
 /**
  * \brief Put the system to sleep waiting for interrupt.
  *
@@ -53,8 +55,12 @@ static void demo_set_sleepmode_STANDBY()
 
 int main(void)
 {
+	CRTC rtc;
+
 	// Chip and peripheral initialization
 	system_init();	
+
+	rtc.Initialize();
 
 	// Program Init
 	/** Set STANDBY as sleep mode */
@@ -81,14 +87,14 @@ int main(void)
 		else
 		{
 			// Enable the RTC interrupt to wake up in 5 secs
-			RTC_EnableInterrupt();
+			rtc.EnableInterrupt();
 
 			// Enter sleep mode
 			demo_system_sleep();
 
 			// On wakeup, disable the RTC interrupt
 			// Enable the RTC interrupt to wake up in 5 secs
-			RTC_DisableInterrupt();
+			rtc.DisableInterrupt();
 
 			// Wait 2 seconds before starting LED flash again
 			delay_ms(2000);
