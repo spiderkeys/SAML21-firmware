@@ -44,6 +44,6 @@
 #ifndef ATMEL_PARTS_H
 #define ATMEL_PARTS_H
 
-#include "saml21.h"
+#include "sam.h"
 
 #endif /* ATMEL_PARTS_H */
