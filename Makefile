@@ -164,7 +164,7 @@ $(BINARY_DIR)/$(CFG)/$(TARGET).elf: $(OBJECTS)
 	"arm-none-eabi-objcopy" -j .eeprom --set-section-flags=.eeprom=alloc,load --change-section-lma \
 		.eeprom=0 --no-change-warnings -O binary "$(BINARY_DIR)/$(CFG)/$(TARGET).elf" "$(BINARY_DIR)/$(CFG)/$(TARGET).eep" || exit 0
 	"arm-none-eabi-objdump" -h -S "$(BINARY_DIR)/$(CFG)/$(TARGET).elf" > "$(BINARY_DIR)/$(CFG)/$(TARGET).lss"
-	"arm-none-eabi-size" "$(BINARY_DIR)/$(CFG)/$(TARGET).elf"
+	"arm-none-eabi-size" -A "$(BINARY_DIR)/$(CFG)/$(TARGET).elf"
 
 # --- Generic Compilation Command
 
