@@ -56,16 +56,10 @@
 void _init_chip(void)
 {
 	hri_nvmctrl_set_CTRLB_RWS_bf(NVMCTRL, CONF_NVM_WAIT_STATE);
-
-	_set_performance_level(2);
-
+	
 	_osc32kctrl_init_sources();
 	_oscctrl_init_sources();
 	_mclk_init();
 	_gclk_init_generators();
 	_oscctrl_init_referenced_generators();
-
-	hri_mclk_set_AHBMASK_DMAC_bit(MCLK);
-
-	_dma_init();
 }

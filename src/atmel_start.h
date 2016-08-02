@@ -44,6 +44,10 @@
 	void ADC_0_init(void);
 	void ADC_0_example(void);
 
+	void RTC_Init();
+	void RTC_EnableInterrupt();
+	void RTC_DisableInterrupt();
+
 	void delay_driver_init(void);
 	void delay_example(void);
 

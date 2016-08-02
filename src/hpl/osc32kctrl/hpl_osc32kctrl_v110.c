@@ -43,4 +43,4 @@
 
 #include <hri_osc32kctrl_v110.h>
 #include "hpl_osc32kctrl_v110_config.h"
-#include <hpl_osc32kctrl_v110_base.inc>
+#include <hpl_osc32kctrl_v110_base.h>

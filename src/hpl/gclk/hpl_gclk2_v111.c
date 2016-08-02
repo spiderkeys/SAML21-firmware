@@ -45,4 +45,4 @@
 #include <hpl_init.h>
 #include <hpl_gclk2_v111_config.h>
 #include <hri_gclk2_v111.h>
-#include <hpl_gclk2_v111_base.inc>
+#include <hpl_gclk2_v111_base.h>
