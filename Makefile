@@ -118,8 +118,8 @@ endif
 
 # Add debugging symbols
 ifeq ($(CFG),debug)
-CFLAGS += -g3 -DDEBUG
-CPPFLAGS += -g3 -DDEBUG
+CFLAGS += -O1 -g -DDEBUG
+CPPFLAGS += -O1 -g -DDEBUG
 endif
 
 ifneq ($(CFG),debug)
@@ -163,7 +163,7 @@ $(BINARY_DIR)/$(CFG)/$(TARGET).elf: $(OBJECTS)
 	"arm-none-eabi-objcopy" -O ihex -R .eeprom -R .fuse -R .lock -R .signature "$(BINARY_DIR)/$(CFG)/$(TARGET).elf" "$(BINARY_DIR)/$(CFG)/$(TARGET).hex"
 	"arm-none-eabi-objcopy" -j .eeprom --set-section-flags=.eeprom=alloc,load --change-section-lma \
 		.eeprom=0 --no-change-warnings -O binary "$(BINARY_DIR)/$(CFG)/$(TARGET).elf" "$(BINARY_DIR)/$(CFG)/$(TARGET).eep" || exit 0
-	"arm-none-eabi-objdump" -h -S "$(BINARY_DIR)/$(CFG)/$(TARGET).elf" > "$(BINARY_DIR)/$(CFG)/$(TARGET).lss"
+	"arm-none-eabi-objdump" -h -S -l "$(BINARY_DIR)/$(CFG)/$(TARGET).elf" > "$(BINARY_DIR)/$(CFG)/$(TARGET).lss"
 	"arm-none-eabi-size" -A "$(BINARY_DIR)/$(CFG)/$(TARGET).elf"
 
 # --- Generic Compilation Command

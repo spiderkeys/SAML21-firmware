@@ -53,6 +53,11 @@ static void demo_set_sleepmode_STANDBY()
 	while (PM->SLEEPCFG.reg != PM_SLEEPCFG_SLEEPMODE_STANDBY);
 }
 
+#include "drivers/GPIO.hpp"
+
+typedef gpio::CPin< gpio::PORTB, 10 > led;
+
+
 int main(void)
 {
 	CRTC rtc;
@@ -77,9 +82,9 @@ int main(void)
 	{
 		if( count != 0 )
 		{
-			gpio_set_pin_level(LED0, false);
+			led::Set();
 			delay_ms(500);
-			gpio_set_pin_level(LED0, true);
+			led::Clear();
 			delay_ms(500);
 
 			count--;
