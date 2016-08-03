@@ -25,7 +25,7 @@ PROJECT_NAME="saml21"
 # PROJECT_TYPE - staticlib, dynamiclib, executable
 PROJECT_TYPE=executable
 
-# PROJECT_MAIN - filename within your source directory that contains main()
+# PROJECT_MAIN - filename within your source directory that contains main() 
 PROJECT_MAIN=main.c
 
 # TARGET - the name you want your target to have (bin/release/[whatgoeshere])
