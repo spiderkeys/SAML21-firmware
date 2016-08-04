@@ -19,57 +19,56 @@
 
 # --- PROJECT CONFIGURATION
 
-# PROJECT_NAME - not actually used.  but what's your project's name?
-PROJECT_NAME="saml21"
+#APP - Which "sketch" to build
+APP=TridentPower
 
-# PROJECT_TYPE - staticlib, dynamiclib, executable
-PROJECT_TYPE=executable
+#CHIP - Which part number to build for, e.g. "SAML21J18B"
+CHIP=SAML21J18B
 
-# PROJECT_MAIN - filename within your source directory that contains main() 
-PROJECT_MAIN=main.c
+#VARIANT - Which setup to use for the specified chip
+VARIANT=0000
 
-# TARGET - the name you want your target to have (bin/release/[whatgoeshere])
-TARGET=saml21
+# ------------------------------
 
-# LDINCLUDES - Include paths for libraries, i.e. '-I/usr/local/include'
-LDINCLUDES=-I"src/" \
-			-I"src/config" \
-			-I"src/hal/include" \
-			-I"src/hal/utils/include" \
-			-I"src/hpl/core" \
-			-I"src/hpl/adc" \
-			-I"src/hpl/dmac" \
-			-I"src/hpl/gclk" \
-			-I"src/hpl/mclk" \
-			-I"src/hpl/osc32kctrl" \
-			-I"src/hpl/oscctrl" \
-			-I"src/hpl/pm" \
-			-I"src/hpl/port" \
-			-I"src/hpl/sercom" \
-			-I"src/hpl/systick" \
-			-I"src/hpl/tc" \
-			-I"src/hri" \
-			-I"src/CMSIS/Include" \
-			-I"src/saml21b/include"	\
-			-I"src/adp" \
-			-I"src/sleep_manager"
+# Include Setup
+LDINCLUDES=-I"include/cmsis/include" \
+			-I"include/cmsis/atmel"
+
+LDINCLUDES+=-I"src/cores/$(CHIP)" \
+			-I"src/variants/$(CHIP)/$(VARIANT)"
+
+LDINCLUDES+=-I"src/cores/$(CHIP)/" \
+			-I"src/cores/$(CHIP)/config" \
+			-I"src/cores/$(CHIP)/hal/include" \
+			-I"src/cores/$(CHIP)/hal/utils/include" \
+			-I"src/cores/$(CHIP)/hpl/core" \
+			-I"src/cores/$(CHIP)/hpl/adc" \
+			-I"src/cores/$(CHIP)/hpl/dmac" \
+			-I"src/cores/$(CHIP)/hpl/gclk" \
+			-I"src/cores/$(CHIP)/hpl/mclk" \
+			-I"src/cores/$(CHIP)/hpl/osc32kctrl" \
+			-I"src/cores/$(CHIP)/hpl/oscctrl" \
+			-I"src/cores/$(CHIP)/hpl/pm" \
+			-I"src/cores/$(CHIP)/hpl/port" \
+			-I"src/cores/$(CHIP)/hpl/sercom" \
+			-I"src/cores/$(CHIP)/hpl/systick" \
+			-I"src/cores/$(CHIP)/hpl/tc" \
+			-I"src/cores/$(CHIP)/hri"
 
 # LDLIBPATHS - Lib paths for libraries, i.e. '-L/usr/local/lib'
-LDLIBPATHS=-L"../saml21b/gcc/gcc"
+LDLIBPATHS=
 
 # LDFLAGS - Flags to be passed to the linker. Additional options will be added later based on build target
 LDFLAGS=$(LDLIBPATHS) \
 			-Wl,--no-wchar-size-warning \
 			-mthumb \
-			-Wl,-Map="$(BINARY_DIR)/$(CFG)/$(TARGET).map" \
+			-Wl,-Map="$(BINARY_DIR)/$(APP)/$(CFG)/$(APP).map" \
 			--specs=nano.specs \
 			-Wl,--gc-sections \
 			-mcpu=cortex-m0plus \
-			-T"linker_scripts/saml21j18b_flash.ld"
+			-T"linker_scripts/$(CHIP)/flash.ld"
 
 # LDLIBS - Which libs to link to, i.e. '-lm' or 'somelib.a'
-#
-#LDLIBS=-lzmq -lmxcam -lmxuvc -lavformat -lavcodec -lavutil -lswresample -lswscale -lx264 -lmxcam -lmxuvc -lpthread 
 LDLIBS=-Wl,--start-group -lm -Wl,--end-group
 
 # --- INCLUDE CONFIGURATION
@@ -82,8 +81,9 @@ EXTRA_INCLUDES=
 # subdirectories of each other.  They should be completely disjoint.  Also,
 # being too creative with directories could seriously mess up gcov, which is a
 # finicky beast.
-SOURCE_DIR=src
-BUILD_DIR=build
+
+SOURCE_DIRS=src/apps/$(APP) src/cores/$(CHIP) src/variants/$(CHIP)/$(VARIANT)
+BUILD_DIR=build/$(APP)
 OBJECT_DIR=$(BUILD_DIR)/obj
 BINARY_DIR=$(BUILD_DIR)/bin
 DEPENDENCY_DIR=$(BUILD_DIR)/dep
@@ -95,14 +95,14 @@ CC=arm-none-eabi-gcc
 CXX=arm-none-eabi-g++
 
 # --- C++ compiler flags. We'll add on to these later based on build target.
-CXFLAGS=-x c -mthumb -ffunction-sections -mlong-calls -Wall -std=gnu99 -D__SAML21J18B__ -mcpu=cortex-m0plus
-CXXFLAGS=-x c++ -mthumb -ffunction-sections -mlong-calls -Wall -std=c++14 -D__SAML21J18B__ -mcpu=cortex-m0plus
+CXFLAGS=-x c -mthumb -ffunction-sections -mlong-calls -Wall -std=gnu99 -D__$(CHIP)__ -mcpu=cortex-m0plus
+CXXFLAGS=-x c++ -mthumb -ffunction-sections -mlong-calls -Wall -std=c++14 -D__$(CHIP)__ -mcpu=cortex-m0plus
 
 # --------------------------------------------------------------------------------------------------
 
 # The options below here should only be changed if you really need to. Most options are configured above
 
-INCLUDES=-I$(INCLUDE_DIR) -I$(SOURCE_DIR) $(LDINCLUDES) $(EXTRA_INCLUDES)
+INCLUDES=$(LDINCLUDES) $(EXTRA_INCLUDES)
 
 CFLAGS=$(CXFLAGS) $(INCLUDES) -c
 CPPFLAGS=$(CXXFLAGS) $(INCLUDES) -c
@@ -128,53 +128,49 @@ $(error Bad build configuration.  Choices are debug, release)
 endif
 endif
 
+$(warning hey)
+
 # --- FILENAME LISTS: (and other internal variables)
 DIR_GUARD=@mkdir -p $(@D)
-OBJECT_MAIN=$(OBJECT_DIR)/$(CFG)/$(SOURCE_DIR)/$(patsubst %.c,%.o,$(PROJECT_MAIN))
 
-# Find all C and C++ source files
-SOURCES=$(shell find $(SOURCE_DIR) -type f -name "*.c*")
+# Generate object and dependency lists
+COBJECTS=$(foreach sdir,$(SOURCE_DIRS),$(patsubst $(sdir)/%.c,$(OBJECT_DIR)/$(APP)/$(CFG)/$(sdir)/%.o,$(shell find $(sdir) -type f -name "*.c")))
+CPPOBJECTS=$(foreach sdir,$(SOURCE_DIRS),$(patsubst $(sdir)/%.cpp,$(OBJECT_DIR)/$(APP)/$(CFG)/$(sdir)/%.o,$(shell find $(sdir) -type f -name "*.cpp")))
+OBJECTS=$(COBJECTS) $(CPPOBJECTS)
 
-# Setup both C and C++ objects
-COBJECTS=$(patsubst $(SOURCE_DIR)/%.c,$(OBJECT_DIR)/$(CFG)/$(SOURCE_DIR)/%.o,$(SOURCES))
-OBJECTS=$(patsubst $(SOURCE_DIR)/%.cpp,$(OBJECT_DIR)/$(CFG)/$(SOURCE_DIR)/%.o,$(COBJECTS))
-
-# Setup both C and C++ dependencies
-CDEPENDENCIES=$(patsubst $(SOURCE_DIR)/%.c,$(DEPENDENCY_DIR)/$(SOURCE_DIR)/%.d,$(SOURCES))
-DEPENDENCIES=$(patsubst $(SOURCE_DIR)/%.cpp,$(DEPENDENCY_DIR)/$(SOURCE_DIR)/%.d,$(CDEPENDENCIES))
+CDEPENDENCIES=$(foreach sdir,$(SOURCE_DIRS),$(patsubst $(sdir)/%.c,$(DEPENDENCY_DIR)/$(SOURCE_DIR)/%.d,$(shell find $(sdir) -type f -name "*.c")))
+CPPDEPENDENCIES=$(foreach sdir,$(SOURCE_DIRS),$(patsubst $(sdir)/%.cpp,$(DEPENDENCY_DIR)/$(SOURCE_DIR)/%.d,$(shell find $(sdir) -type f -name "*.cpp")))
+DEPENDENCIES=$(CDEPENDENCIES) $(CPPDEPENDENCIES)
 
 # --- GLOBAL TARGETS: You can probably adjust and augment these if you'd like.
-.PHONY: all clean clean_all
+.PHONY: all clean
 
-all: $(BINARY_DIR)/$(CFG)/$(TARGET).elf
+all: $(BINARY_DIR)/$(APP)/$(CFG)/$(APP).elf
 
 clean:
-	rm -rf $(OBJECT_DIR)/$(CFG)/* $(BINARY_DIR)/$(CFG)/* $(SOURCE_DIR)/*.gch
-
-clean_all:
-	rm -rf $(BUILD_DIR) $(SOURCE_DIR)/*.gch
+	rm -rf $(BUILD_DIR)
 
 # RULE TO BUILD YOUR MAIN TARGET HERE: (you may have to edit this, but it is configurable).
-$(BINARY_DIR)/$(CFG)/$(TARGET).elf: $(OBJECTS)
+$(BINARY_DIR)/$(APP)/$(CFG)/$(APP).elf: $(OBJECTS)
 	$(DIR_GUARD)
 	$(CXX) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 	@echo Finished building target: $@
-	"arm-none-eabi-objcopy" -O binary "$(BINARY_DIR)/$(CFG)/$(TARGET).elf" "$(BINARY_DIR)/$(CFG)/$(TARGET).bin"
-	"arm-none-eabi-objcopy" -O ihex -R .eeprom -R .fuse -R .lock -R .signature "$(BINARY_DIR)/$(CFG)/$(TARGET).elf" "$(BINARY_DIR)/$(CFG)/$(TARGET).hex"
+	"arm-none-eabi-objcopy" -O binary "$(BINARY_DIR)/$(APP)/$(CFG)/$(APP).elf" "$(BINARY_DIR)/$(APP)/$(CFG)/$(APP).bin"
+	"arm-none-eabi-objcopy" -O ihex -R .eeprom -R .fuse -R .lock -R .signature "$(BINARY_DIR)/$(APP)/$(CFG)/$(APP).elf" "$(BINARY_DIR)/$(APP)/$(CFG)/$(APP).hex"
 	"arm-none-eabi-objcopy" -j .eeprom --set-section-flags=.eeprom=alloc,load --change-section-lma \
-		.eeprom=0 --no-change-warnings -O binary "$(BINARY_DIR)/$(CFG)/$(TARGET).elf" "$(BINARY_DIR)/$(CFG)/$(TARGET).eep" || exit 0
-	"arm-none-eabi-objdump" -h -S -l "$(BINARY_DIR)/$(CFG)/$(TARGET).elf" > "$(BINARY_DIR)/$(CFG)/$(TARGET).lss"
-	"arm-none-eabi-size" -A "$(BINARY_DIR)/$(CFG)/$(TARGET).elf"
+		.eeprom=0 --no-change-warnings -O binary "$(BINARY_DIR)/$(APP)/$(CFG)/$(APP).elf" "$(BINARY_DIR)/$(APP)/$(CFG)/$(APP).eep" || exit 0
+	"arm-none-eabi-objdump" -h -S -l "$(BINARY_DIR)/$(APP)/$(CFG)/$(APP).elf" > "$(BINARY_DIR)/$(APP)/$(CFG)/$(APP).lss"
+	"arm-none-eabi-size" -A "$(BINARY_DIR)/$(APP)/$(CFG)/$(APP).elf"
 
 # --- Generic Compilation Command
 
 # C Files
-$(OBJECT_DIR)/$(CFG)/%.o: %.c
+$(OBJECT_DIR)/$(APP)/$(CFG)/%.o: %.c
 	$(DIR_GUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
 # CPP files
-$(OBJECT_DIR)/$(CFG)/%.o: %.cpp
+$(OBJECT_DIR)/$(APP)/$(CFG)/%.o: %.cpp
 	$(DIR_GUARD)
 	$(CXX) $(CPPFLAGS) $< -o $@
 

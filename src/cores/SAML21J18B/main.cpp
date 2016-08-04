@@ -1,4 +1,3 @@
-
 extern "C"
 {
 	#include "atmel_start.h"
@@ -53,10 +52,9 @@ static void demo_set_sleepmode_STANDBY()
 	while (PM->SLEEPCFG.reg != PM_SLEEPCFG_SLEEPMODE_STANDBY);
 }
 
-#include "drivers/GPIO.hpp"
+#include "drivers/Port.hpp"
 
-typedef gpio::CPin< gpio::PORTB, 10 > led;
-
+typedef port::CDigitalPin< port::PORTB, 10 > led;
 
 int main(void)
 {

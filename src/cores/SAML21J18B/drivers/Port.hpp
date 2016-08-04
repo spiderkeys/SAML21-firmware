@@ -1,13 +1,13 @@
 #pragma once
 
-namespace gpio
+namespace port
 {
-	constexpr uint8_t PORTA = 0;
-	constexpr uint8_t PORTB = 1;
-	constexpr uint8_t PORTC = 2;
+    constexpr uint8_t PORTA = 0;
+    constexpr uint8_t PORTB = 1;
+    constexpr uint8_t PORTC = 2;
 
     template< uint8_t port, uint8_t pin >
-    class CPin
+    class CDigitalPin
     {
     public:
         static void Set()
@@ -35,6 +35,16 @@ namespace gpio
             {
                 PORT->Group[port].OUTCLR.reg = (1 << pin);
             }
+        }
+    };
+
+    template< uint8_t port, uint8_t pin >
+    class CAnalogPin
+    {
+    public:
+        static void Read( float &valueOut )
+        {
+            valueOut = 0.0f;
         }
     };
 }
