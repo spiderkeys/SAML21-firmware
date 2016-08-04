@@ -37,6 +37,7 @@ LDINCLUDES=-I"include/cmsis/include" \
 LDINCLUDES+=-I"src/cores/$(CHIP)" \
 			-I"src/variants/$(CHIP)/$(VARIANT)"
 
+# TODO: Remove this. Must be passed in as "EXTRA_INCLUDES" variable
 LDINCLUDES+=-I"src/cores/$(CHIP)/" \
 			-I"src/cores/$(CHIP)/config" \
 			-I"src/cores/$(CHIP)/hal/include" \
