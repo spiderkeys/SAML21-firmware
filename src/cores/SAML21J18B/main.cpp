@@ -1,10 +1,11 @@
 #include <core.h>
-#include <peripherals/nvmctrl.hpp>
+#include <hri/hri_nvmctrl.h>
 
 
 void SysInit()
 {
-	//PNvmctrl::set_CTRLB_RWS_bf( 2 );
+	// Since we are operating at 4MHz, we can leave the wait states at 0
+	hri_nvmctrl_set_CTRLB_RWS_bf( NVMCTRL, 0 );
 	
 	// _osc32kctrl_init_sources();
 	// _oscctrl_init_sources();
@@ -16,7 +17,7 @@ void SysInit()
 int main()
 {
 	// Chip and peripheral initialization
-	// system_init();	
+	SysInit();
 
 	Setup();
 
