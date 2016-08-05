@@ -2,10 +2,11 @@
 
 extern "C"
 {
-	#include <sam.h>
+	#include <compiler.h>
+	#include <hri_mclk_v101.h>
 }
 
-void RTC_Handler(void)
+static void _rtc_interrupt_handler(void *p)
 {
 	/* Read and mask interrupt flag register */
 	uint16_t interrupt_status = RTC->MODE0.INTFLAG.reg;
@@ -26,7 +27,12 @@ public:
 	void Initialize()
 	{
 		// Enable in APBA
-		MCLK->APBCMASK.reg |= MCLK_APBAMASK_RTC;
+		hri_mclk_set_APBAMASK_RTC_bit(MCLK);
+
+		// Setup IRQ handler
+		rtcIRQ.handler = _rtc_interrupt_handler;
+		rtcIRQ.parameter = NULL;
+		_irq_register( RTC_IRQn, &rtcIRQ );
 
 		// Sync
 		while(RTC->MODE0.SYNCBUSY.reg & RTC_MODE0_SYNCBUSY_SWRST ) {};
@@ -63,8 +69,8 @@ public:
 	void EnableInterrupt()
 	{
 		/* enable RTC_IRQn */
-		NVIC_DisableIRQ(RTC_IRQn);
-		NVIC_EnableIRQ(RTC_IRQn);
+		_irq_clear(RTC_IRQn);
+		_irq_enable(RTC_IRQn);
 
 		/* enable cmp */
 		RTC->MODE0.INTENSET.reg = RTC_MODE0_INTENSET_CMP0;
@@ -76,6 +82,9 @@ public:
 		RTC->MODE0.INTENCLR.reg = RTC_MODE0_INTENCLR_CMP0;
 
 		/* disable RTC_IRQn */
-		NVIC_DisableIRQ(RTC_IRQn);
+		_irq_disable(RTC_IRQn);
 	}
+
+private:
+	struct _irq_descriptor rtcIRQ;
 };

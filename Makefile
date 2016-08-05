@@ -26,7 +26,7 @@ APP=TridentPower
 CHIP=SAML21J18B
 
 #VARIANT - Which setup to use for the specified chip
-VARIANT=0000
+VARIANT=power_manager
 
 # ------------------------------
 
@@ -96,8 +96,8 @@ CC=arm-none-eabi-gcc
 CXX=arm-none-eabi-g++
 
 # --- C++ compiler flags. We'll add on to these later based on build target.
-CXFLAGS=-x c -mthumb -ffunction-sections -mlong-calls -Wall -std=gnu99 -D__$(CHIP)__ -mcpu=cortex-m0plus
-CXXFLAGS=-x c++ -mthumb -ffunction-sections -mlong-calls -Wall -std=c++14 -D__$(CHIP)__ -mcpu=cortex-m0plus
+CXFLAGS=-x c -mthumb -ffunction-sections -mlong-calls -Wall -std=gnu99 -D__$(CHIP)__ -mcpu=cortex-m0plus -DDONT_USE_CMSIS_INIT
+CXXFLAGS=-x c++ -mthumb -ffunction-sections -mlong-calls -Wall -std=c++14 -D__$(CHIP)__ -mcpu=cortex-m0plus -DDONT_USE_CMSIS_INIT
 
 # --------------------------------------------------------------------------------------------------
 
@@ -128,8 +128,6 @@ ifneq ($(CFG),release)
 $(error Bad build configuration.  Choices are debug, release)
 endif
 endif
-
-$(warning hey)
 
 # --- FILENAME LISTS: (and other internal variables)
 DIR_GUARD=@mkdir -p $(@D)
